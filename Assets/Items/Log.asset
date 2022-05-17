@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df8d705c712ae974184d05bb6dc0226f, type: 3}
+  m_Name: Log
+  m_EditorClassIdentifier: 
+  icon: {fileID: 21300000, guid: d236d1a9ed56a424f9c7e2a82e6bfc0e, type: 3}
+  itemTitle: Holz
+  description: Kann genutzt werden um daraus Sachen zu bauen.
+  itemTag: Ressource
+  isStackable: 1
+  prefabPath: Log
