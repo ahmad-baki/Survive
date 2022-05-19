@@ -77,16 +77,16 @@ public class PlayerControl : MonoBehaviour
 
     void Move()
     {
+        Vector3 move = new();
         if (!_combatControl.isAttacking)
         {
             _relTargetDir = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
             Vector3 absoluteTargetDir = _relTargetDir.x * Camera.main.transform.right + _relTargetDir.z * Camera.main.transform.forward;
             float speed = (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) ? sprintSpeed : walkSpeed;
-            Vector3 move = absoluteTargetDir.normalized * speed;
-            _playerControl.Move((move + new Vector3(0, _verticalVelocity, 0)) * Time.deltaTime);
+            move = absoluteTargetDir.normalized * speed;
 
+            // remap horVel between 0 and 1
             float horVel = Mathf.Sqrt(Mathf.Pow(move.x, 2) + Mathf.Pow(move.z, 2));
-            // remap horVel between 
             float remappedVel = 0;
             if (horVel >  walkSpeed - 0.1f)
             {
@@ -94,6 +94,7 @@ public class PlayerControl : MonoBehaviour
             }
             _animator.SetFloat("Velocity", remappedVel);
         }
+        _playerControl.Move((move + new Vector3(0, _verticalVelocity, 0)) * Time.deltaTime);
     }
 
     void Rotate()

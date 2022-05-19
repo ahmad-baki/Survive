@@ -3,11 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public enum PlayerAttackType
-{
-    NormalRightPunch, NormalLeftPunch, NormalRightSlash, NormalLeftSlash, StrongRightSlash, StrongLeftSlash, StrongSlash
-}
-
 public class PlayerCombatControl : MonoBehaviour
 {
     public PlayerCombatState playerCombatState;
@@ -16,7 +11,7 @@ public class PlayerCombatControl : MonoBehaviour
     public float attackTime;
 
 
-    InventarManager _inventarManager;
+    PlayerInventarManager _playerInventarManager;
     Animator _animator;
     float _attackStartTime;
 
@@ -25,7 +20,7 @@ public class PlayerCombatControl : MonoBehaviour
     void Start()
     {
         _animator = GetComponent<Animator>();
-        _inventarManager = GetComponent<InventarManager>();
+        _playerInventarManager = GetComponent<PlayerInventarManager>();
         //playerCombatState = PlayerCombatState.Hand;
     }
 
@@ -41,22 +36,32 @@ public class PlayerCombatControl : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Mouse0))
             {
-                if (!(_inventarManager.weaponGO is var weaponGO)) return;
+                if (!(_playerInventarManager.MainHandEquipGO is var weaponGO)) return;
                 Weapon weapon = weaponGO.GetComponent<Weapon>();
-                if (weapon.playerCombatState == PlayerCombatState.Hand)
-                {
-                    weapon.StartAttack();
-                    _attackStartTime = Time.time;
-                    isAttacking = true;
-                    _animator.SetTrigger("PunchRight");
-                }
+                weapon.StartAttack();
+                _attackStartTime = Time.time;
+                isAttacking = true;
+                _animator.SetTrigger("StartAttack");
             }
         }
         else if (Time.time > _attackStartTime + attackTime)
         {
             isAttacking = false;
-            Weapon weapon = _inventarManager.weaponGO.GetComponent<Weapon>();
+            Weapon weapon = _playerInventarManager.MainHandEquipGO.GetComponent<Weapon>();
             weapon.EndAttack();
+        }
+    }
+
+    public void OnWeaponChange(EquipmentItem equipmentItem)
+    {
+        switch (equipmentItem.itemTag)
+        {
+            case "Sword":
+                _animator.SetTrigger("ToSword");
+                break;
+            case "Hand":
+                _animator.SetTrigger("ToHand");
+                break;
         }
     }
 }

@@ -1,7 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
-
+using UnityEngine.EventSystems;
 
 [CreateAssetMenu(fileName = "Item", menuName = "ScriptableObjects/Item")]
 public class Item : ScriptableObject
@@ -11,10 +13,8 @@ public class Item : ScriptableObject
     public string description;
     public string itemTag;
     public bool isStackable;
-    public string prefabPath;
+    public string useTitle = "Nutzen";
+    public GameObject prefab;
 
-    public GameObject Prefab
-    {
-        get { return Resources.Load<GameObject>(prefabPath); }
-    }
+    public virtual void Use() { }
 }

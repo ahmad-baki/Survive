@@ -17,4 +17,5 @@ MonoBehaviour:
   description: Kann genutzt werden um daraus Sachen zu bauen.
   itemTag: Ressource
   isStackable: 1
-  prefabPath: Log
+  useTitle: Nutzen
+  prefab: {fileID: 0}

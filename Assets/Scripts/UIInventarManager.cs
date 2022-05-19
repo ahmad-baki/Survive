@@ -15,22 +15,23 @@ public class UIInventarManager : SzeneSingelton<UIInventarManager>
     public Button extraDropButton;
     public GameObject slotPrefab;
     public GameObject dropPopUp;
-    public Button dropButton;
-    public Button abortDropButton;
+    public Button popDropButton;
+    public Button popAbortDropButton;
+    public EquipSlot rightHandSlot;
+    public EquipSlot leftHandSlot;
+    public PlayerInventarManager playerInventarManager;
 
-    InventarManager _playerInventarManager;
-    TextMeshProUGUI _extraTitle;
-    Image _extraIcon;
-    TextMeshProUGUI _extraDesc;
-    TextMeshProUGUI _extraTag;
+    public TextMeshProUGUI extraTitle;
+    public Image extraIcon;
+    public TextMeshProUGUI extraDesc;
+    public TextMeshProUGUI extraTag;
     bool _didDeactivateAttacking;
 
     private void Start()
     {
-        _playerInventarManager = FindObjectOfType<InventarManager>();
-        _playerInventarManager.onChangeSlot.AddListener(ReloadSlot);
-        _playerInventarManager.onAddSlot.AddListener(AddSlot);
-        _playerInventarManager.onRemoveSlot.AddListener(RemoveSlot);
+        //playerInventarManager.onChangeSlot.AddListener(ReloadSlot);
+        //playerInventarManager.onAddSlot.AddListener(AddSlot);
+        //playerInventarManager.onRemoveSlot.AddListener(RemoveSlot);
         Cursor.lockState = CursorLockMode.Locked;
 
         foreach(Transform transform in extraInformation.GetComponentInChildren<Transform>())
@@ -38,21 +39,21 @@ public class UIInventarManager : SzeneSingelton<UIInventarManager>
             switch (transform.name)
             {
                 case "Title":
-                    _extraTitle = transform.GetComponent<TextMeshProUGUI>();
+                    extraTitle = transform.GetComponent<TextMeshProUGUI>();
                     break;
                 case "Desc":
-                    _extraDesc = transform.GetComponent<TextMeshProUGUI>();
+                    extraDesc = transform.GetComponent<TextMeshProUGUI>();
                     break;
                 case "Icon":
-                    _extraIcon = transform.GetComponent<Image>();
+                    extraIcon = transform.GetComponent<Image>();
                     break;
                 case "Tag":
-                    _extraTag = transform.GetComponent<TextMeshProUGUI>();
+                    extraTag = transform.GetComponent<TextMeshProUGUI>();
                     break;
             }
         }
 
-        abortDropButton.onClick.AddListener(CloseDropPopUp);
+        popAbortDropButton.onClick.AddListener(CloseDropPopUp);
     }
 
 
@@ -64,29 +65,16 @@ public class UIInventarManager : SzeneSingelton<UIInventarManager>
             {
                 if (inventarUI.activeInHierarchy)
                 {
-                    inventarUI.SetActive(false);
-                    extraInformation.SetActive(false);
-                    Cursor.lockState = CursorLockMode.Locked;
-
-                    PlayerCombatControl playerCombatControl = _playerInventarManager.GetComponent<PlayerCombatControl>();
-                    if (_didDeactivateAttacking)
-                    {
-                        playerCombatControl.AttackingEnabled = true;
-                        _didDeactivateAttacking = false;
-                    }
+                    CloseInventar();
                 }
                 else
                 {
-                    inventarUI.SetActive(true);
-                    Cursor.lockState = CursorLockMode.None;
-
-                    PlayerCombatControl playerCombatControl = _playerInventarManager.GetComponent<PlayerCombatControl>();
-                    if (playerCombatControl.AttackingEnabled)
-                    {
-                        playerCombatControl.AttackingEnabled = false;
-                        _didDeactivateAttacking = true;
-                    }
+                    OpenInventar();
                 }
+            }
+            else if (Input.GetKeyDown(KeyCode.Escape) && inventarUI.activeInHierarchy)
+            {
+                CloseInventar();
             }
         }
     }
@@ -100,19 +88,12 @@ public class UIInventarManager : SzeneSingelton<UIInventarManager>
             return;
         }
 
-        List<Item> inventar = _playerInventarManager.inventar;
-        Dictionary<string, int> itemCounter = _playerInventarManager.itemCounter;
+        List<Item> inventar = playerInventarManager.inventar;
+        Dictionary<string, int> itemCounter = playerInventarManager.itemCounter;
         foreach (Transform slotTrans in itemSlots.transform)
         {
             if(slotTrans.name == $"Slot{index}")
             {
-                //if (index >= inventar.Count || inventar[index] is null)
-                //{
-                //    Destroy(slotTrans.gameObject);
-                //    return;
-                //}
-                //else
-                //{
                 Image image = slotTrans.GetComponentInChildren<Image>();
                 if (image != null)
                 {
@@ -124,15 +105,14 @@ public class UIInventarManager : SzeneSingelton<UIInventarManager>
                     string itemName = inventar[index].itemTitle;
                     tmpPro.text = (inventar[index].isStackable) ? itemCounter[itemName].ToString() : "";
                 }
-                //}
             }
         }
     }
 
     public void AddSlot(int index)
     {
-        List<Item> inventar = _playerInventarManager.inventar;
-        Dictionary<string, int> itemCounter = _playerInventarManager.itemCounter;
+        List<Item> inventar = playerInventarManager.inventar;
+        Dictionary<string, int> itemCounter = playerInventarManager.itemCounter;
         if (index + 1 > itemSlots.transform.childCount)
         {
             for (int i = itemSlots.transform.childCount; i < index + 1; i++)
@@ -140,7 +120,17 @@ public class UIInventarManager : SzeneSingelton<UIInventarManager>
                 GameObject slot = Instantiate(slotPrefab, itemSlots.transform);
                 slot.GetComponent<ItemSlot>().index = index;
                 slot.name = $"Slot{i}";
-                Image image = slot.GetComponentInChildren<Image>();
+                Image image = null;
+                foreach (Image img in slot.GetComponentsInChildren<Image>())
+                {
+                    if (!img.gameObject.Equals(slot))
+                    {
+                        image = img;
+                        break;
+                    }
+                }
+                if (image is null) return;
+
                 if (image != null)
                 {
                     image.sprite = inventar[i].icon;
@@ -155,7 +145,6 @@ public class UIInventarManager : SzeneSingelton<UIInventarManager>
             return;
         }
     }
-    
 
     public void RemoveSlot(int index) 
     {
@@ -182,42 +171,91 @@ public class UIInventarManager : SzeneSingelton<UIInventarManager>
         }
     }
 
+    public void ReloadEquipSlot(EquipmentItem equipment)
+    {
+        switch (equipment.equipType)
+        {
+            case EquipType.MainHand:
+                rightHandSlot.ChangeItem(equipment);
+                break;
+            case EquipType.OffHand:
+                leftHandSlot.ChangeItem(equipment);
+                break;
+            case EquipType.BothHand:
+                rightHandSlot.ChangeItem(equipment);
+                leftHandSlot.ChangeItem(equipment);
+                break;
+            default:
+                return;
+        }
+    }
 
     public void OnClickedItem(int index, PointerEventData eventData)
     {
-        List<Item> inventar = _playerInventarManager.inventar;
-        if (inventar.Count <= index) return;
+        int count = playerInventarManager.inventar.Count;
+        if (index >= count || index < 0)
+        {
+            Debug.LogWarning($"Cant acces element {index} of inventar with size {count}");
+        }
 
-        _extraTitle.text = inventar[index].itemTitle.ToString();
-        _extraDesc.text = inventar[index].description.ToString();
-        _extraTag.text = inventar[index].itemTag.ToString();
-        _extraIcon.sprite = inventar[index].icon;
+        Item item = playerInventarManager.inventar[index];
+        extraTitle.text = item.itemTitle;
+        extraDesc.text = item.description;
+        extraTag.text = item.itemTag;
+        extraIcon.sprite = item.icon;
+        extraUseButton.GetComponentInChildren<TextMeshProUGUI>().text = item.useTitle;
+        extraUseButton.onClick.AddListener(item.Use);
         extraDropButton.onClick.AddListener(() => OpenDropPopUp(index));
         extraInformation.SetActive(true);
+    }
+
+    public void CloseInventar() {
+        inventarUI.SetActive(false);
+        extraInformation.SetActive(false);
+        Cursor.lockState = CursorLockMode.Locked;
+
+        PlayerCombatControl playerCombatControl = playerInventarManager.GetComponent<PlayerCombatControl>();
+        if (_didDeactivateAttacking)
+        {
+            playerCombatControl.AttackingEnabled = true;
+            _didDeactivateAttacking = false;
+        }
+    }
+
+    public void OpenInventar() {
+        inventarUI.SetActive(true);
+        Cursor.lockState = CursorLockMode.None;
+
+        PlayerCombatControl playerCombatControl = playerInventarManager.GetComponent<PlayerCombatControl>();
+        if (playerCombatControl.AttackingEnabled)
+        {
+            playerCombatControl.AttackingEnabled = false;
+            _didDeactivateAttacking = true;
+        }
     }
 
     public void OpenDropPopUp(int index)
     {
         TMP_InputField inputField = dropPopUp.GetComponentInChildren<TMP_InputField>();
-        dropButton.onClick.AddListener(() => {
+        popDropButton.onClick.AddListener(() => {
             if (int.TryParse(inputField.text, out int amount) && amount > 0)
             {
-                _playerInventarManager.DropItem(index, amount);
+                playerInventarManager.DropItem(index, amount);
                 CloseDropPopUp();
             }
         });
 
         inputField.onEndEdit.AddListener((string text) =>
         {
-            int maxAmount = _playerInventarManager.GetAmount(index);
+            int maxAmount = playerInventarManager.GetAmount(index);
             int inputAmount;
-            if(Int32.TryParse(text, out inputAmount))
+            if (Int32.TryParse(text, out inputAmount))
             {
-                if(inputAmount < 0)
+                if (inputAmount < 0)
                 {
                     inputField.text = "0";
                 }
-                else if(inputAmount > maxAmount)
+                else if (inputAmount > maxAmount)
                 {
                     inputField.text = maxAmount.ToString();
                 }

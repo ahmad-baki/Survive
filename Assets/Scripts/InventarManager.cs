@@ -5,29 +5,21 @@ using UnityEngine.Events;
 
 public class InventarManager : MonoBehaviour
 {
-    public GameObject rightHand;
-    public GameObject leftHand;
-    public GameObject weaponGO;
     public int maxItemAmount;
-    public List<Item> inventar;
-    public Dictionary<string, int> itemCounter;
-    public UnityEvent<int> onChangeSlot;
-    public UnityEvent<int> onRemoveSlot;
-    public UnityEvent<int> onAddSlot;
+    public List<Item> inventar = new();
+    public Dictionary<string, int> itemCounter = new();
+    public UnityEvent<int> onChangeSlot = new();
+    public UnityEvent<int> onRemoveSlot = new();
+    public UnityEvent<int> onAddSlot = new();
 
-    // Start is called before the first frame update
-    void Awake()
+    protected void Start()
     {
-        if (onChangeSlot is null)
+        for(int i = 0; i < inventar.Count; i++)
         {
-            onChangeSlot = new();
+            onAddSlot?.Invoke(i);
         }
-
-        inventar = new();
-        itemCounter = new();
     }
 
-    
     public bool AddItem(Item addItem, int count = 1)
     {
         if(!addItem.isStackable && count > 1)
@@ -60,50 +52,6 @@ public class InventarManager : MonoBehaviour
         inventar.Add(addItem);
         onAddSlot?.Invoke(inventar.Count - 1);
         return true;
-
-
-        //if (itemCounter.ContainsKey(addItem.itemName))
-        //{
-        //    itemCounter[addItem.itemName] += count;
-        //    for (int i = 0; i < inventar.Count; i++)
-        //    {
-        //        if (inventar[i].itemName == addItem.itemName)
-        //        {
-        //            onChangeSlot?.Invoke(i);
-        //            return true;
-        //        }
-
-        //        itemCounter.Remove(addItem.itemName);
-        //        Debug.LogWarning($"itemCounter contains {addItem.name}, despite it being not in the inventar, removed item from itemCounter and proceeded normaly");
-        //    }
-        //}
-        //else
-        //{
-        //    for (int i = 0; i < inventar.Count; i++)
-        //    {
-        //        if (inventar[i] is null)
-        //        {
-        //            inventar[i] = addItem;
-
-        //            if (addItem.isStackable)
-        //            {
-        //                itemCounter.Add(addItem.itemName, count);
-        //            }
-        //            else if (itemCounter.ContainsKey(addItem.itemName))
-        //            {
-        //                itemCounter[addItem.itemName] += count;
-        //            }
-        //            else
-        //            {
-        //                itemCounter.Add(addItem.itemName, count);
-        //            }
-        //            onChangeSlot?.Invoke(i);
-        //            return true;
-        //        }
-        //    }
-        //    Debug.LogWarning($"Cant add {addItem.itemName}, becouse inventar is full");
-        //}
-        //return false;
     }
 
     public bool RemoveItem(Item remItem, int count = 1)
@@ -179,7 +127,7 @@ public class InventarManager : MonoBehaviour
 
     public bool DropItem(int index, int count = 1)
     {
-        GameObject prefab = inventar[index].Prefab;
+        GameObject prefab = inventar[index].prefab;
         if(prefab is null) return false;
         if (!RemoveItem(index, count)) return false;
 
