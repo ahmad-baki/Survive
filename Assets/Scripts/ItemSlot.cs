@@ -25,7 +25,7 @@ public class ItemSlot : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, I
     public void OnBeginDrag(PointerEventData eventData)
     {
         GameObject hover = new("Hover");
-        hover.transform.parent = transform.parent.parent;
+        hover.transform.parent = transform.parent.parent.parent;
         RectTransform rectTransform = hover.AddComponent<RectTransform>();
         rectTransform.position = transform.position;
         rectTransform.sizeDelta = GetComponent<RectTransform>().sizeDelta;

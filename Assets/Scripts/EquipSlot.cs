@@ -5,10 +5,11 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class EquipSlot : MonoBehaviour, IDropHandler
+public class EquipSlot : MonoBehaviour, IDropHandler, IPointerDownHandler
 {
-    [SerializeField]
-    BodyPart bodyPart;
+    public Sprite defaultIcon;
+    public BodyPart bodyPart;
+    public EquipmentItem equipmentItem;
 
     Image _image;
     TextMeshProUGUI tmpPro;
@@ -19,17 +20,28 @@ public class EquipSlot : MonoBehaviour, IDropHandler
         tmpPro = GetComponent<TextMeshProUGUI>();
     }
 
-    public void ChangeItem(Item item)
+    public void ChangeEquipment(EquipmentItem equipItem)
     {
-
         if (_image != null)
         {
-            _image.sprite = item.icon;
+            _image.sprite = equipItem.icon;
         }
         if (tmpPro != null)
         {
-            string itemName = item.itemTitle;
-            tmpPro.text = (item.isStackable) ? item.ToString() : "";
+            string itemName = equipItem.itemTitle;
+            tmpPro.text = (equipItem.isStackable) ? equipItem.ToString() : "";
+        }
+    }
+
+    public void Clear()
+    {
+        if (defaultIcon)
+        {
+            _image.sprite = defaultIcon;
+        }
+        else
+        {
+            _image.sprite = null;
         }
     }
 
@@ -41,7 +53,9 @@ public class EquipSlot : MonoBehaviour, IDropHandler
             PlayerInventarManager playerInventarManager = UIInventarManager.Singelton.playerInventarManager;
             Item item = playerInventarManager.inventar[itemSlotHover.index];
             if (item is EquipmentItem) {
-                playerInventarManager.Equip(item as EquipmentItem, bodyPart);
+                EquipmentItem equipmentItem = (EquipmentItem)item;
+                playerInventarManager.Equip(equipmentItem, bodyPart);
+                this.equipmentItem = equipmentItem;
             }
             else
             {
@@ -49,5 +63,17 @@ public class EquipSlot : MonoBehaviour, IDropHandler
             }
             Destroy(eventData.pointerDrag);
         }
+    }
+
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        PlayerInventarManager playerInventarManager = UIInventarManager.Singelton.playerInventarManager;
+        int index = playerInventarManager.inventar.IndexOf(equipmentItem);
+        if(index == -1)
+        {
+            Debug.LogWarning($"Couldnt find item {equipmentItem.itemTitle} in inventar");
+            return;
+        }
+        UIInventarManager.Singelton.OnClickedItem(index, eventData);
     }
 }

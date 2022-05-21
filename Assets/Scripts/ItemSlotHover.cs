@@ -7,7 +7,6 @@ public class ItemSlotHover : MonoBehaviour, IDragHandler, IEndDragHandler
 {
     public int index;
 
-    Canvas _canvas;
     RectTransform _rectTransform;
     CanvasGroup _canvasGroup;
 
@@ -15,14 +14,14 @@ public class ItemSlotHover : MonoBehaviour, IDragHandler, IEndDragHandler
     {
         _rectTransform = GetComponent<RectTransform>();
         _canvasGroup = GetComponent<CanvasGroup>();
-        _canvas = UIManager.Singelton.mainCanvas;
         _canvasGroup.blocksRaycasts = false;
         _canvasGroup.alpha = 0.7f;
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        _rectTransform.anchoredPosition += eventData.delta / _canvas.scaleFactor;
+        //_rectTransform.anchoredPosition += eventData.delta / _canvas.scaleFactor;
+        _rectTransform.position = Input.mousePosition;
     }
 
     public void OnEndDrag(PointerEventData eventData)

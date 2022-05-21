@@ -16,6 +16,9 @@ public class InventarManager : MonoBehaviour
     {
         for(int i = 0; i < inventar.Count; i++)
         {
+            string title = inventar[i].itemTitle;
+            if (!itemCounter.ContainsKey(title)) itemCounter.Add(title, 1);
+            else itemCounter[title]++;
             onAddSlot?.Invoke(i);
         }
     }
@@ -24,7 +27,6 @@ public class InventarManager : MonoBehaviour
     {
         if(!addItem.isStackable && count > 1)
         {
-            Debug.LogWarning($"Tried to add {count} of {addItem.name} to inventar, despite them being non-stackable");
             return false;
         }
 
@@ -42,7 +44,6 @@ public class InventarManager : MonoBehaviour
                     }
                 }
                 itemCounter[addItem.itemTitle] = count;
-                Debug.LogWarning($"itemCounter contains {addItem.name}, despite it being not in the inventar");
             }
         }
         else
@@ -133,13 +134,10 @@ public class InventarManager : MonoBehaviour
 
         GameObject dropedItem = Instantiate(prefab, transform.position, Quaternion.identity);
         dropedItem.name = prefab.name;
-        if(dropedItem.GetComponent<Pickable>() is var pickable)
+        Pickable pickable = dropedItem.GetComponent<Pickable>();
+        if (pickable is not null)
         {
             pickable.amount = count;
-        }
-        else
-        {
-            Debug.LogWarning($"{dropedItem.name} doesnt have Pickable-Component");
         }
         return true;
     }

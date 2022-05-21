@@ -7,15 +7,23 @@ public class PlayerInventarManager : InventarManager
 {
     public GameObject rightHand;
     public GameObject leftHand;
-    public UnityEvent<EquipmentItem> onEquipChange;
+    // the default
+    public GameObject bareHandPrefab;
+    public UnityEvent<EquipmentItem, BodyPart> onEquip;
+    public UnityEvent<BodyPart> onUnEquip;
 
-    EquipmentItem mainHandEquip;
-    EquipmentItem offHandEquip;
+
+    EquipmentItem rightHandEquip;
+    EquipmentItem leftHandEquip;
 
 
     public GameObject MainHandEquipGO
     {
-        get { return rightHand.transform.GetChild(0).gameObject; }
+        get
+        {
+            if (rightHand.transform.childCount > 0) return rightHand.transform.GetChild(0).gameObject;
+            return null;
+        }
     }
 
     public GameObject OffHandEquipGO
@@ -25,13 +33,13 @@ public class PlayerInventarManager : InventarManager
 
     public EquipmentItem MainHandEquip
     {
-        get { return mainHandEquip; }
+        get { return rightHandEquip; }
         set { Equip(value, BodyPart.RightHand); }
     }
 
     public EquipmentItem OffHandEquip
     {
-        get { return offHandEquip; }
+        get { return leftHandEquip; }
         set { Equip(value, BodyPart.LeftHand); }
     }
 
@@ -40,20 +48,20 @@ public class PlayerInventarManager : InventarManager
     protected new void Start()
     {
         base.Start();
-        onEquipChange.AddListener(SpawnItem);
+        onEquip.AddListener(SpawnEquipment);
     }
 
-    void SpawnItem(EquipmentItem equipment) {
+    void SpawnEquipment(EquipmentItem equipment, BodyPart bodyPart) {
         GameObject spawnTarget;
-        switch (equipment.equipType)
+        switch (bodyPart)
         {
-            case EquipType.MainHand:
+            case BodyPart.RightHand:
                 spawnTarget = rightHand;
                 break;
-            case EquipType.OffHand:
+            case BodyPart.LeftHand:
                 spawnTarget = leftHand;
                 break;
-            case EquipType.BothHand:
+            case BodyPart.BothHand:
                 spawnTarget = rightHand;
                 break;
             default:
@@ -67,22 +75,98 @@ public class PlayerInventarManager : InventarManager
 
     public void Equip(EquipmentItem equipment, BodyPart prefTarget)
     {
+        BodyPart target = prefTarget;
         switch (equipment.equipType)
-        {
+        { 
             case EquipType.MainHand:
-                mainHandEquip = equipment;
+                UnEquip(BodyPart.RightHand);
+                target = BodyPart.RightHand;
+                rightHandEquip = equipment;
                 break;
             case EquipType.OffHand:
-                offHandEquip = equipment;
+                UnEquip(BodyPart.LeftHand);
+                target = BodyPart.LeftHand;
+                leftHandEquip = equipment;
                 break;
             case EquipType.BothHand:
-                mainHandEquip = equipment;
-                offHandEquip = equipment;
+                UnEquip(BodyPart.RightHand);
+                UnEquip(BodyPart.LeftHand);
+                target = BodyPart.BothHand;
+                rightHandEquip = equipment;
+                leftHandEquip = equipment;
+                break;
+            case EquipType.SingleHand:
+                switch (prefTarget)
+                {
+                    case BodyPart.LeftHand:
+                        UnEquip(BodyPart.LeftHand);
+                        leftHandEquip = equipment;
+                        break;
+                    case BodyPart.RightHand:
+                        UnEquip(BodyPart.RightHand);
+                        rightHandEquip = equipment;
+                        break;
+                    default:
+                        return;
+                }
                 break;
             default:
                 return;
         }
+        onEquip?.Invoke(equipment, target);
+    }
 
-        onEquipChange?.Invoke(equipment);
+
+    public void UnEquip(BodyPart bodyPart)
+    {
+        switch (bodyPart)
+        {
+            case BodyPart.RightHand:
+                foreach (Transform childTrans in rightHand.transform)
+                {
+                    Destroy(childTrans.gameObject);
+                }
+                break;
+            case BodyPart.LeftHand:
+                foreach (Transform childTrans in leftHand.transform)
+                {
+                    Destroy(childTrans.gameObject);
+                }
+                break;
+
+        }
+    }
+
+    public void UnEquip(EquipmentItem equipmentItem)
+    {
+        if (equipmentItem == null) return;
+        if (rightHandEquip.Equals(equipmentItem))
+        {
+            foreach(Transform childTrans in rightHand.transform)
+            {
+                Destroy(childTrans.gameObject);
+            }
+            Instantiate(bareHandPrefab, rightHand.transform);
+            rightHandEquip = null;
+            onUnEquip?.Invoke(BodyPart.RightHand);
+        }
+        if (leftHandEquip == equipmentItem)
+        {
+            foreach (Transform childTrans in leftHand.transform)
+            {
+                Destroy(childTrans.gameObject);
+            }
+            Instantiate(bareHandPrefab, leftHand.transform);
+            leftHandEquip = null;
+            onUnEquip?.Invoke(BodyPart.LeftHand);
+        }
+    }
+
+    public bool IsEquiped(EquipmentItem equipmentItem)
+    {
+        if(equipmentItem == null) return false;
+        if (rightHandEquip == equipmentItem) return true;
+        if(leftHandEquip == equipmentItem) return true;
+        return false;
     }
 }

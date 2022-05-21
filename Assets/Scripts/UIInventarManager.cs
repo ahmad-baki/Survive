@@ -25,13 +25,15 @@ public class UIInventarManager : SzeneSingelton<UIInventarManager>
     public Image extraIcon;
     public TextMeshProUGUI extraDesc;
     public TextMeshProUGUI extraTag;
+
     bool _didDeactivateAttacking;
+    Item _clickedItem;
 
     private void Start()
     {
-        //playerInventarManager.onChangeSlot.AddListener(ReloadSlot);
-        //playerInventarManager.onAddSlot.AddListener(AddSlot);
-        //playerInventarManager.onRemoveSlot.AddListener(RemoveSlot);
+        playerInventarManager.onChangeSlot.AddListener(ReloadSlot);
+        playerInventarManager.onAddSlot.AddListener(AddSlot);
+        playerInventarManager.onRemoveSlot.AddListener(RemoveSlot);
         Cursor.lockState = CursorLockMode.Locked;
 
         foreach(Transform transform in extraInformation.GetComponentInChildren<Transform>())
@@ -171,22 +173,35 @@ public class UIInventarManager : SzeneSingelton<UIInventarManager>
         }
     }
 
-    public void ReloadEquipSlot(EquipmentItem equipment)
+    public void ReloadEquipSlot(EquipmentItem equipment, BodyPart bodyPart)
     {
-        switch (equipment.equipType)
+        switch (bodyPart)
         {
-            case EquipType.MainHand:
-                rightHandSlot.ChangeItem(equipment);
+            case BodyPart.RightHand:
+                rightHandSlot.ChangeEquipment(equipment);
                 break;
-            case EquipType.OffHand:
-                leftHandSlot.ChangeItem(equipment);
+            case BodyPart.LeftHand:
+                leftHandSlot.ChangeEquipment(equipment);
                 break;
-            case EquipType.BothHand:
-                rightHandSlot.ChangeItem(equipment);
-                leftHandSlot.ChangeItem(equipment);
+            case BodyPart.BothHand:
+                rightHandSlot.ChangeEquipment(equipment);
+                leftHandSlot.ChangeEquipment(equipment);
                 break;
             default:
                 return;
+        }
+    }
+
+    public void ClearEquipSlot(BodyPart bodyPart)
+    {
+        switch (bodyPart)
+        {
+            case BodyPart.RightHand:
+                rightHandSlot.Clear();
+                break;
+            case BodyPart.LeftHand:
+                leftHandSlot.Clear();
+                break;
         }
     }
 
@@ -196,16 +211,40 @@ public class UIInventarManager : SzeneSingelton<UIInventarManager>
         if (index >= count || index < 0)
         {
             Debug.LogWarning($"Cant acces element {index} of inventar with size {count}");
+            return;
         }
-
         Item item = playerInventarManager.inventar[index];
         extraTitle.text = item.itemTitle;
         extraDesc.text = item.description;
         extraTag.text = item.itemTag;
         extraIcon.sprite = item.icon;
-        extraUseButton.GetComponentInChildren<TextMeshProUGUI>().text = item.useTitle;
+
+        extraUseButton.onClick.RemoveAllListeners();
+        extraDropButton.onClick.RemoveAllListeners();
+
         extraUseButton.onClick.AddListener(item.Use);
-        extraDropButton.onClick.AddListener(() => OpenDropPopUp(index));
+        if(item.isStackable) extraDropButton.onClick.AddListener(() => OpenDropPopUp(index));
+        else extraDropButton.onClick.AddListener(() => playerInventarManager.DropItem(index, 1));
+
+        TextMeshProUGUI tMPro = extraUseButton.GetComponentInChildren<TextMeshProUGUI>();
+        if (item is EquipmentItem)
+        {
+            EquipmentItem equipmentItem = (EquipmentItem)item;
+            if (playerInventarManager.IsEquiped(equipmentItem))
+            {
+                tMPro.text = "Derüsten";
+            }
+            else
+            {
+                tMPro.text = "Ausrüsten";
+            }
+        }
+        else
+        {
+            tMPro.text = "Nutzen";
+        }
+
+        _clickedItem = item;
         extraInformation.SetActive(true);
     }
 
@@ -213,6 +252,9 @@ public class UIInventarManager : SzeneSingelton<UIInventarManager>
         inventarUI.SetActive(false);
         extraInformation.SetActive(false);
         Cursor.lockState = CursorLockMode.Locked;
+
+        extraUseButton.onClick.RemoveAllListeners();
+        extraDropButton.onClick.RemoveAllListeners();
 
         PlayerCombatControl playerCombatControl = playerInventarManager.GetComponent<PlayerCombatControl>();
         if (_didDeactivateAttacking)
@@ -272,5 +314,38 @@ public class UIInventarManager : SzeneSingelton<UIInventarManager>
     public void CloseDropPopUp()
     {
         dropPopUp.SetActive(false);
+    }
+
+    public void ChangeExtraButtonText(EquipmentItem equipmentItem, BodyPart bodyPart)
+    {
+        if(equipmentItem == _clickedItem)
+        {
+            TextMeshProUGUI tMPro = extraUseButton.GetComponentInChildren<TextMeshProUGUI>();
+            if (playerInventarManager.IsEquiped(equipmentItem))
+            {
+                tMPro.text = "Derüsten";
+            }
+            else
+            {
+                tMPro.text = "Ausrüsten";
+            }
+        }
+    }
+
+    public void ChangeExtraButtonText(BodyPart bodyPart)
+    {
+        if (_clickedItem is EquipmentItem)
+        {
+            EquipmentItem equipmentItem = _clickedItem as EquipmentItem;
+            TextMeshProUGUI tMPro = extraUseButton.GetComponentInChildren<TextMeshProUGUI>();
+            if (playerInventarManager.IsEquiped(equipmentItem))
+            {
+                tMPro.text = "Derüsten";
+            }
+            else
+            {
+                tMPro.text = "Ausrüsten";
+            }
+        }
     }
 }

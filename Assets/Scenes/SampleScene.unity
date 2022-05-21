@@ -1069,17 +1069,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 3898367523131525916, guid: b205766821daf854ebdd66736b4038de, type: 3}
   m_PrefabInstance: {fileID: 3360994708125706811}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &545079222 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3360994707981862046, guid: b205766821daf854ebdd66736b4038de, type: 3}
-  m_PrefabInstance: {fileID: 3360994708125706811}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 545079221}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 44f97311ac072ff47b6d70b3d3e66bb9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &545079228
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1097,52 +1086,17 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 44f1cabd3135700498811ddfb0ab961d, type: 2}
   onChangeSlot:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 528181449}
-        m_TargetAssemblyTypeName: UIInventarManager, Assembly-CSharp
-        m_MethodName: ReloadSlot
-        m_Mode: 3
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   onRemoveSlot:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 528181449}
-        m_TargetAssemblyTypeName: UIInventarManager, Assembly-CSharp
-        m_MethodName: RemoveSlot
-        m_Mode: 3
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   onAddSlot:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 528181449}
-        m_TargetAssemblyTypeName: UIInventarManager, Assembly-CSharp
-        m_MethodName: AddSlot
-        m_Mode: 3
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   rightHand: {fileID: 17614583}
   leftHand: {fileID: 3360994708125706813}
-  onEquipChange:
+  bareHandPrefab: {fileID: 7501691152942533517, guid: 2eaaf37dc9a5a7d44a5fa3a22a7bf8e2, type: 3}
+  onEquip:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 528181449}
@@ -1157,7 +1111,19 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 545079222}
+      - m_Target: {fileID: 528181449}
+        m_TargetAssemblyTypeName: UIInventarManager, Assembly-CSharp
+        m_MethodName: ChangeExtraButtonText
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 545079229}
         m_TargetAssemblyTypeName: PlayerCombatControl, Assembly-CSharp
         m_MethodName: OnWeaponChange
         m_Mode: 0
@@ -1169,6 +1135,56 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  onUnEquip:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 528181449}
+        m_TargetAssemblyTypeName: UIInventarManager, Assembly-CSharp
+        m_MethodName: ClearEquipSlot
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 528181449}
+        m_TargetAssemblyTypeName: UIInventarManager, Assembly-CSharp
+        m_MethodName: ChangeExtraButtonText
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 545079229}
+        m_TargetAssemblyTypeName: PlayerCombatControl, Assembly-CSharp
+        m_MethodName: ToFist
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!114 &545079229 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3360994707981862046, guid: b205766821daf854ebdd66736b4038de, type: 3}
+  m_PrefabInstance: {fileID: 3360994708125706811}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 545079221}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44f97311ac072ff47b6d70b3d3e66bb9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &645912382
 GameObject:
   m_ObjectHideFlags: 0
@@ -1203,9 +1219,9 @@ RectTransform:
   m_Father: {fileID: 127661745}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -89, y: 0}
+  m_AnchorMin: {x: 0, y: 0.5}
+  m_AnchorMax: {x: 0, y: 0.5}
+  m_AnchoredPosition: {x: 36, y: 0}
   m_SizeDelta: {x: 50, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &645912384
@@ -1258,7 +1274,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f831fb8e899ed94e970f259940d25f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  defaultIcon: {fileID: 0}
   bodyPart: 1
+  equipmentItem: {fileID: 0}
 --- !u!1 &658793995
 GameObject:
   m_ObjectHideFlags: 0
@@ -1415,9 +1433,9 @@ RectTransform:
   m_Father: {fileID: 127661745}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 89, y: 0}
+  m_AnchorMin: {x: 1, y: 0.5}
+  m_AnchorMax: {x: 1, y: 0.5}
+  m_AnchoredPosition: {x: -36, y: 0}
   m_SizeDelta: {x: 50, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &679886591
@@ -1470,7 +1488,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f831fb8e899ed94e970f259940d25f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  defaultIcon: {fileID: 0}
   bodyPart: 2
+  equipmentItem: {fileID: 0}
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -2963,7 +2983,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 2.2157996, y: 1}
+    m_SensorSize: {x: 2.1194606, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0

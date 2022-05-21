@@ -13,7 +13,6 @@ public class Item : ScriptableObject
     public string description;
     public string itemTag;
     public bool isStackable;
-    public string useTitle = "Nutzen";
     public GameObject prefab;
 
     public virtual void Use() { }

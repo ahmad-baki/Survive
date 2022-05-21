@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10c13e49a85e59f48b2372943095a411, type: 3}
   m_Name: Schwert
   m_EditorClassIdentifier: 
-  icon: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
+  icon: {fileID: 21300000, guid: 026dd1957872d6c48af9b0cbfce10d1e, type: 3}
   itemTitle: Schwert
   description: Schwert
   itemTag: Sword
   isStackable: 0
   useTitle: "Ausr\xFCsten"
-  prefab: {fileID: 4118821522534722646, guid: 9c5a65e899779fc48b3326ece39f650e, type: 3}
-  equipType: 2
+  prefab: {fileID: 8228609133391478469, guid: b32eafe22db17b845903c4572b3dcf00, type: 3}
+  equipType: 0

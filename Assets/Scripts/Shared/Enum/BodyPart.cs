@@ -1,3 +1,3 @@
 ﻿public enum BodyPart { 
-    Null, LeftHand, RightHand
+    Null, LeftHand, RightHand, BothHand
 }

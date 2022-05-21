@@ -1,4 +1,4 @@
 ﻿public enum EquipType
 {
-    MainHand, OffHand, BothHand, 
+    MainHand, OffHand, BothHand, SingleHand
 }
